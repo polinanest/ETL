@@ -1,4 +1,5 @@
-# docker-compose.yml - с исправлениями
+version: '3.8'
+
 x-airflow-common: &airflow-common
   image: apache/airflow:2.7.3
   environment: &airflow-common-env
@@ -6,10 +7,11 @@ x-airflow-common: &airflow-common
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__FERNET_KEY: '46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho='
-    AIRFLOW__WEBSERVER__SECRET_KEY: 'mysecretkey123'  # ← ДОБАВЬТЕ ЭТО
+    AIRFLOW__WEBSERVER__SECRET_KEY: 'mysecretkey123'  
   volumes:
-    - ./pipeline.py:/opt/airflow/dags/pipeline.py
-    - ./pets-data.json:/opt/airflow/dags/pets-data.json
+    - ./dags:/opt/airflow/dags
+
+  user: "${AIRFLOW_UID:-50000}:0"
 
 services:
   postgres:

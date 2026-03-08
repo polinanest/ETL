@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - ./mongo/init-data.js:/docker-entrypoint-initdb.d/init-data.js:ro
+      - mongo_data:/data/db
+    networks:
+      - data_platform
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: analytics_db
+    volumes:
+      - ./postgres/init-schema.sql:/docker-entrypoint-initdb.d/01-init-schema.sql:ro
+      - ./postgres/create-analytical-views.sql:/docker-entrypoint-initdb.d/02-create-views.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - data_platform
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d analytics_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres_airflow:
+    image: postgres:15
+    container_name: postgres_airflow
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_airflow_data:/var/lib/postgresql/data
+    networks:
+      - data_platform
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow-webserver:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    container_name: airflow-webserver
+    restart: unless-stopped
+    depends_on:
+      postgres_airflow:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      # Исправлено: admin/admin для postgres_airflow
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres_airflow:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'simple-key-for-learning'
+      # Исправлено: admin/admin для MongoDB
+      AIRFLOW_CONN_MONGO_DEFAULT: mongodb://admin:admin@mongodb:27017/user_analytics?authSource=admin
+      # Исправлено: admin/admin для PostgreSQL
+      AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://admin:admin@postgres:5432/analytics_db
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    networks:
+      - data_platform
+    command: >
+      bash -c "
+        airflow db init &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com &&
+        airflow webserver
+      "
+
+  airflow-scheduler:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    container_name: airflow-scheduler
+    restart: unless-stopped
+    depends_on:
+      airflow-webserver:
+        condition: service_started
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres_airflow:5432/airflow
+      AIRFLOW__WEBSERVER__SECRET_KEY: 'simple-key-for-learning'
+      AIRFLOW_CONN_MONGO_DEFAULT: mongodb://admin:admin@mongodb:27017/user_analytics?authSource=admin
+      AIRFLOW_CONN_POSTGRES_DEFAULT: postgresql://admin:admin@postgres:5432/analytics_db
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+    networks:
+      - data_platform
+    command: scheduler
+
+networks:
+  data_platform:
+    driver: bridge
+
+volumes:
+  mongo_data:
+  postgres_data:
+  postgres_airflow_data:

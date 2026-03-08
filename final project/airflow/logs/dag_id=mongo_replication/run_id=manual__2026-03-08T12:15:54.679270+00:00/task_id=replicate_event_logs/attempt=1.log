@@ -1,0 +1,37 @@
+[2026-03-08T12:16:33.382+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mongo_replication.replicate_event_logs manual__2026-03-08T12:15:54.679270+00:00 [queued]>
+[2026-03-08T12:16:33.413+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mongo_replication.replicate_event_logs manual__2026-03-08T12:15:54.679270+00:00 [queued]>
+[2026-03-08T12:16:33.415+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 3
+[2026-03-08T12:16:33.631+0000] {taskinstance.py:1380} INFO - Executing <Task(PythonOperator): replicate_event_logs> on 2026-03-08 12:15:54.679270+00:00
+[2026-03-08T12:16:33.857+0000] {standard_task_runner.py:57} INFO - Started process 257 to run task
+[2026-03-08T12:16:33.993+0000] {standard_task_runner.py:84} INFO - Running: ['airflow', 'tasks', 'run', 'mongo_replication', 'replicate_event_logs', 'manual__2026-03-08T12:15:54.679270+00:00', '--job-id', '8', '--raw', '--subdir', 'DAGS_FOLDER/replication_dag.py', '--cfg-path', '/tmp/tmpmeci_ay2']
+[2026-03-08T12:16:34.076+0000] {standard_task_runner.py:85} INFO - Job 8: Subtask replicate_event_logs
+[2026-03-08T12:16:34.858+0000] {logging_mixin.py:151} WARNING - /home/airflow/.local/lib/python3.9/site-packages/airflow/settings.py:195 DeprecationWarning: The sql_alchemy_conn option in [core] has been moved to the sql_alchemy_conn option in [database] - the old setting has been used, but please update your config.
+[2026-03-08T12:16:36.739+0000] {task_command.py:415} INFO - Running <TaskInstance: mongo_replication.replicate_event_logs manual__2026-03-08T12:15:54.679270+00:00 [running]> on host 061c2a96f512
+[2026-03-08T12:16:40.221+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='mongo_replication' AIRFLOW_CTX_TASK_ID='replicate_event_logs' AIRFLOW_CTX_EXECUTION_DATE='2026-03-08T12:15:54.679270+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-03-08T12:15:54.679270+00:00'
+[2026-03-08T12:16:40.732+0000] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2026-03-08T12:16:40.855+0000] {base.py:73} INFO - Using connection ID 'mongo_default' for task execution.
+[2026-03-08T12:16:40.988+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:16:41.964+0000] {sql.py:418} INFO - Running statement: SELECT last_sequence_id FROM raw_data.replication_state WHERE collection_name = %s, parameters: ('event_logs',)
+[2026-03-08T12:16:41.973+0000] {sql.py:427} INFO - Rows affected: 1
+[2026-03-08T12:16:43.899+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:16:43.988+0000] {sql.py:418} INFO - Running statement: SELECT id FROM raw_data.event_logs WHERE event_id = %s, parameters: ('evt_1001',)
+[2026-03-08T12:16:43.993+0000] {sql.py:427} INFO - Rows affected: 0
+[2026-03-08T12:16:44.011+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:16:44.051+0000] {sql.py:418} INFO - Running statement: INSERT INTO raw_data.event_logs (event_id, timestamp, event_type, details, user_id, session_id) VALUES (%s, %s, %s, %s, %s, %s), parameters: ('evt_1001', {'$date': '2024-01-10T09:05:20Z'}, 'click', '{"page": "/products/42"}', None, None)
+[2026-03-08T12:16:44.058+0000] {taskinstance.py:1935} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/operators/python.py", line 192, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/operators/python.py", line 209, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/replication_dag.py", line 62, in replicate_collection
+    postgres_hook.run(insert_sql, parameters=tuple(record.values()))
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/providers/common/sql/hooks/sql.py", line 392, in run
+    self._run_command(cur, sql_statement, parameters)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/providers/common/sql/hooks/sql.py", line 421, in _run_command
+    cur.execute(sql_statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'dict'
+[2026-03-08T12:16:44.264+0000] {taskinstance.py:1398} INFO - Marking task as UP_FOR_RETRY. dag_id=mongo_replication, task_id=replicate_event_logs, execution_date=20260308T121554, start_date=20260308T121633, end_date=20260308T121644
+[2026-03-08T12:16:44.307+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 8 for task replicate_event_logs (can't adapt type 'dict'; 257)
+[2026-03-08T12:16:44.362+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2026-03-08T12:16:45.383+0000] {taskinstance.py:2776} INFO - 0 downstream tasks scheduled from follow-on schedule check

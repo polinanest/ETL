@@ -1,0 +1,37 @@
+[2026-03-08T12:16:33.049+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: mongo_replication.replicate_moderation_queue scheduled__2026-03-08T12:00:00+00:00 [queued]>
+[2026-03-08T12:16:33.127+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: mongo_replication.replicate_moderation_queue scheduled__2026-03-08T12:00:00+00:00 [queued]>
+[2026-03-08T12:16:33.137+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 3
+[2026-03-08T12:16:33.388+0000] {taskinstance.py:1380} INFO - Executing <Task(PythonOperator): replicate_moderation_queue> on 2026-03-08 12:00:00+00:00
+[2026-03-08T12:16:33.493+0000] {standard_task_runner.py:57} INFO - Started process 254 to run task
+[2026-03-08T12:16:33.651+0000] {standard_task_runner.py:84} INFO - Running: ['airflow', 'tasks', 'run', 'mongo_replication', 'replicate_moderation_queue', 'scheduled__2026-03-08T12:00:00+00:00', '--job-id', '9', '--raw', '--subdir', 'DAGS_FOLDER/replication_dag.py', '--cfg-path', '/tmp/tmp57eot4t2']
+[2026-03-08T12:16:33.702+0000] {standard_task_runner.py:85} INFO - Job 9: Subtask replicate_moderation_queue
+[2026-03-08T12:16:34.820+0000] {logging_mixin.py:151} WARNING - /home/airflow/.local/lib/python3.9/site-packages/airflow/settings.py:195 DeprecationWarning: The sql_alchemy_conn option in [core] has been moved to the sql_alchemy_conn option in [database] - the old setting has been used, but please update your config.
+[2026-03-08T12:16:36.806+0000] {task_command.py:415} INFO - Running <TaskInstance: mongo_replication.replicate_moderation_queue scheduled__2026-03-08T12:00:00+00:00 [running]> on host 061c2a96f512
+[2026-03-08T12:16:38.824+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='mongo_replication' AIRFLOW_CTX_TASK_ID='replicate_moderation_queue' AIRFLOW_CTX_EXECUTION_DATE='2026-03-08T12:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2026-03-08T12:00:00+00:00'
+[2026-03-08T12:16:38.949+0000] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2026-03-08T12:16:38.950+0000] {base.py:73} INFO - Using connection ID 'mongo_default' for task execution.
+[2026-03-08T12:16:38.953+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:16:39.182+0000] {sql.py:418} INFO - Running statement: SELECT last_sequence_id FROM raw_data.replication_state WHERE collection_name = %s, parameters: ('moderation_queue',)
+[2026-03-08T12:16:39.190+0000] {sql.py:427} INFO - Rows affected: 1
+[2026-03-08T12:16:40.998+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:16:41.930+0000] {sql.py:418} INFO - Running statement: SELECT id FROM raw_data.moderation_queue WHERE review_id = %s, parameters: ('rev_555',)
+[2026-03-08T12:16:42.682+0000] {sql.py:427} INFO - Rows affected: 0
+[2026-03-08T12:16:42.750+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:16:42.957+0000] {sql.py:418} INFO - Running statement: INSERT INTO raw_data.moderation_queue (review_id, user_id, product_id, review_text, rating, moderation_status, flags, submitted_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s), parameters: ('rev_555', 'user_123', 'prod_101', 'Отличный товар, работает как нужно!', 5, 'pending', ['contains_images'], {'$date': '2024-01-08T10:20:00Z'})
+[2026-03-08T12:16:43.004+0000] {taskinstance.py:1935} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/operators/python.py", line 192, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/operators/python.py", line 209, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/replication_dag.py", line 62, in replicate_collection
+    postgres_hook.run(insert_sql, parameters=tuple(record.values()))
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/providers/common/sql/hooks/sql.py", line 392, in run
+    self._run_command(cur, sql_statement, parameters)
+  File "/home/airflow/.local/lib/python3.9/site-packages/airflow/providers/common/sql/hooks/sql.py", line 421, in _run_command
+    cur.execute(sql_statement, parameters)
+psycopg2.ProgrammingError: can't adapt type 'dict'
+[2026-03-08T12:16:43.258+0000] {taskinstance.py:1398} INFO - Marking task as UP_FOR_RETRY. dag_id=mongo_replication, task_id=replicate_moderation_queue, execution_date=20260308T120000, start_date=20260308T121633, end_date=20260308T121643
+[2026-03-08T12:16:43.856+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 9 for task replicate_moderation_queue (can't adapt type 'dict'; 254)
+[2026-03-08T12:16:43.932+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2026-03-08T12:16:44.578+0000] {taskinstance.py:2776} INFO - 0 downstream tasks scheduled from follow-on schedule check

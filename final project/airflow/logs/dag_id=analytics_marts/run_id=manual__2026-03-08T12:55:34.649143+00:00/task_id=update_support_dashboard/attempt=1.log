@@ -1,0 +1,17 @@
+[2026-03-08T12:55:37.297+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: analytics_marts.update_support_dashboard manual__2026-03-08T12:55:34.649143+00:00 [queued]>
+[2026-03-08T12:55:37.308+0000] {taskinstance.py:1157} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: analytics_marts.update_support_dashboard manual__2026-03-08T12:55:34.649143+00:00 [queued]>
+[2026-03-08T12:55:37.309+0000] {taskinstance.py:1359} INFO - Starting attempt 1 of 2
+[2026-03-08T12:55:37.329+0000] {taskinstance.py:1380} INFO - Executing <Task(PythonOperator): update_support_dashboard> on 2026-03-08 12:55:34.649143+00:00
+[2026-03-08T12:55:37.337+0000] {standard_task_runner.py:57} INFO - Started process 215 to run task
+[2026-03-08T12:55:37.342+0000] {standard_task_runner.py:84} INFO - Running: ['airflow', 'tasks', 'run', 'analytics_marts', 'update_support_dashboard', 'manual__2026-03-08T12:55:34.649143+00:00', '--job-id', '33', '--raw', '--subdir', 'DAGS_FOLDER/analytics_marts.py', '--cfg-path', '/tmp/tmp23v_rjcx']
+[2026-03-08T12:55:37.347+0000] {standard_task_runner.py:85} INFO - Job 33: Subtask update_support_dashboard
+[2026-03-08T12:55:37.382+0000] {logging_mixin.py:151} WARNING - /home/airflow/.local/lib/python3.9/site-packages/airflow/settings.py:195 DeprecationWarning: The sql_alchemy_conn option in [core] has been moved to the sql_alchemy_conn option in [database] - the old setting has been used, but please update your config.
+[2026-03-08T12:55:37.443+0000] {task_command.py:415} INFO - Running <TaskInstance: analytics_marts.update_support_dashboard manual__2026-03-08T12:55:34.649143+00:00 [running]> on host 90cb6322f616
+[2026-03-08T12:55:37.685+0000] {taskinstance.py:1660} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='airflow' AIRFLOW_CTX_DAG_ID='analytics_marts' AIRFLOW_CTX_TASK_ID='update_support_dashboard' AIRFLOW_CTX_EXECUTION_DATE='2026-03-08T12:55:34.649143+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-03-08T12:55:34.649143+00:00'
+[2026-03-08T12:55:37.689+0000] {crypto.py:82} WARNING - empty cryptography key - values will not be stored encrypted.
+[2026-03-08T12:55:37.690+0000] {base.py:73} INFO - Using connection ID 'postgres_default' for task execution.
+[2026-03-08T12:55:37.707+0000] {sql.py:418} INFO - Running statement: REFRESH MATERIALIZED VIEW CONCURRENTLY analytics.support_dashboard;, parameters: None
+[2026-03-08T12:55:37.785+0000] {python.py:194} INFO - Done. Returned value was: None
+[2026-03-08T12:55:37.806+0000] {taskinstance.py:1398} INFO - Marking task as SUCCESS. dag_id=analytics_marts, task_id=update_support_dashboard, execution_date=20260308T125534, start_date=20260308T125537, end_date=20260308T125537
+[2026-03-08T12:55:37.859+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 0
+[2026-03-08T12:55:37.891+0000] {taskinstance.py:2776} INFO - 0 downstream tasks scheduled from follow-on schedule check
