@@ -1,6 +1,6 @@
-<<<<<<< HEAD
-
 # ETL Exam
+
+Отчет со скриншотами: https://docs.google.com/document/d/154F5yZTRu18_ffVWyYqQWNv4W-30AZCv1LVexSTxeW0/edit?usp=sharing
 
 ## Задание 1. Работа с Yandex DataTransfer
 
@@ -51,5 +51,31 @@
 - `task1/02_insert_sample.yql` — вставка тестовых данных
 
 =======
-# ETL
->>>>>>> 46cd7bde52a78b38a0dc2a7cb5a0eec40eb9ccff
+
+## Задание 2. Автоматизация Yandex Data Processing с Apache Airflow
+
+### Цель
+Автоматическая обработка файлов из Object Storage с помощью PySpark через Airflow DAG.
+
+### Шаги выполнения
+
+1. Сгенерирован файл `applications.csv` (54.8 МБ, 500 000 строк) и загружен в `etl002/input/`
+2. Написан PySpark скрипт `pyspark_job.py` — читает CSV, считает агрегаты по регионам/продуктам/решениям, сохраняет результат в `etl002/output/applications_agg/`
+3. Скрипт загружен в `etl002/scripts/`
+4. Создан Managed Airflow кластер `airflow211` (версия 2.10)
+5. DAG `DATA_INGEST` выполняет 3 шага: создать кластер DataProc → запустить PySpark → удалить кластер
+6. DAG успешно выполнен, результат в бакете `etl002/output/applications_agg/`
+
+### Структура DAG
+
+| Таск | Оператор | Описание |
+|------|----------|----------|
+| create_cluster | DataprocCreateClusterOperator | Создаёт кластер Spark |
+| run_pyspark | DataprocCreatePysparkJobOperator | Запускает PySpark задание |
+| delete_cluster | DataprocDeleteClusterOperator | Удаляет кластер |
+
+### Файлы
+- `task2/dag_data_ingest.py` — DAG файл
+- `task2/pyspark_job.py` — PySpark задание
+EOF
+
