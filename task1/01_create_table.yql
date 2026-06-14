@@ -1,0 +1,12 @@
+CREATE TABLE transactions_v2 (
+    call_id          Text NOT NULL,
+    call_time        Text,
+    client_id        Text,
+    region_code      Text,
+    campaign_type    Text,
+    call_status      Text,
+    client_response  Text,
+    duration_sec     Int32,
+    follow_up_required Text,
+    PRIMARY KEY (call_id)
+);
