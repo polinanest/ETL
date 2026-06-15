@@ -79,3 +79,27 @@
 - `task2/pyspark_job.py` — PySpark задание
 EOF
 
+======
+
+## Задание 3. Работа с топиками Apache Kafka с помощью PySpark
+
+### Цель
+Настроить чтение топиков Kafka для реализации потоковой аналитики и разложить JSON в плоский вид.
+
+### Шаги выполнения
+
+1. Создан кластер Managed Service for Apache Kafka (`kafka788`, версия 3.9)
+2. Создан топик `loan-applications`
+3. Создан пользователь `kafka-user` с правами producer и consumer на топик
+4. Написан producer (`kafka_producer.py`) — отправляет 50 000 JSON сообщений с данными о кредитных заявках в топик через SASL_SSL
+5. Написан PySpark скрипт (`kafka_pyspark.py`) — читает сообщения из топика, разворачивает вложенный JSON в плоскую таблицу, сохраняет результат в Object Storage
+6. Создан кластер Yandex Data Processing (`dataproc728`) и запущено PySpark задание
+7. Результат сохранён в `etl002/output/kafka_loans/` — 50 000 строк
+
+### Структура JSON топика
+
+Входящие сообщения содержат вложенные объекты: `customer`, `loan`, `scoring`, `documents`. PySpark разворачивает их в плоскую таблицу со столбцами: `application_id`, `customer_id`, `region`, `loan_amount`, `term_months`, `credit_score`, `risk_level`, `decision_status`, `submitted_at`, `doc_type`, `doc_status`.
+
+### Файлы
+- `task3/kafka_producer.py` — отправка JSON в топик Kafka
+- `task3/kafka_pyspark.py` — чтение и обработка данных из Kafka через PySpark
